@@ -1,5 +1,9 @@
 # Easy Ubuntu Script
 
+## 🎓 Contexto
+
+Este script fue desarrollado como un proyecto para la materia "Gestión de Sistemas Operativos" del Grado Superior en Administración de Sistemas Informáticos en Red (ASIR).
+
 ## 📜 Descripción (Español)
 
 `script_fbs.sh` es un script de BASH diseñado para simplificar tareas administrativas comunes en sistemas Ubuntu y derivados de Debian. El script presenta un menú interactivo que permite a los usuarios realizar acciones complejas con una sola pulsación de tecla.
@@ -32,6 +36,10 @@ El objetivo es proporcionar una herramienta "todo en uno" para usuarios que pref
     ```
 
 ---
+
+## 🎓 Context
+
+This script was developed as a project for the "Operating Systems Management" course, part of the Advanced Diploma in Network Systems Administration (ASIR).
 
 ## 📜 Description (English)
 
