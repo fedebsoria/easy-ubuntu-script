@@ -243,11 +243,14 @@ do
         "AUTO DESTRUCCIÓN - SOLO EMERGENCIAS")
             echo "Esta opción destruira el sistema y no habrá retorno"
             read -p "Estás seguro SI/NO" seguro_o_no
-            if [ "$seguro_o_no"="SI" ]
+            if [ "$seguro_o_no" = "SI" ]; then
                 echo "Bueno, no me hago responsable..."
                 echo "Hasta luego, Lucas!"
                 echo "sudo rm -Rf /"
                 sudo shutdown -h now
+            else
+                echo "Operación cancelada."
+            fi
         ;;
         "Salir")
             echo "Adios!"
