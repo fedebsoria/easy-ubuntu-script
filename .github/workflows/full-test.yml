@@ -1,0 +1,105 @@
+name: Full Interactive Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run-interactive-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 1. Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 2. Grant Executable Permissions
+        run: chmod +x ./script_fbs.sh
+
+      - name: 3. Run Interactive Tests and Generate Report
+        run: |
+          # Define the report filename
+          REPORT_FILE="test-options.txt"
+          
+          # Initialize the report file
+          echo "--- Easy Ubuntu Script Test Report ---" > $REPORT_FILE
+          echo "Date: $(date)" >> $REPORT_FILE
+          echo "Commit: $GITHUB_SHA" >> $REPORT_FILE
+          echo "" >> $REPORT_FILE
+
+          # --- Helper Function ---
+          # This function simplifies running each test
+          # Usage: run_test "OptionNumber" "Test Name" "additional_input_1" "additional_input_2" ...
+          run_test() {
+            local option="$1"
+            local test_name="$2"
+            shift 2 # Remove the first 2 arguments, the rest are inputs
+            
+            echo "Testing: $test_name (Option $option)"
+            
+            # Create the input sequence. We always end with "30" to Exit.
+            local input_sequence="$option\n"
+            for input in "$@"; do
+              input_sequence+="$input\n"
+            done
+            input_sequence+="30\n" # Option 30 is "Salir" (Exit)
+
+            # Run the test:
+            # 1. 'echo -e' processes newlines (\n)
+            # 2. The input sequence is piped (|) to the script
+            # 3. 'sudo' is required for the options to work
+            # 4. '>/dev/null 2>&1' hides all output (stdout and stderr)
+            # 5. 'if ...; then' checks the EXIT CODE ($?) of the pipe
+            if echo -e "$input_sequence" | sudo ./script_fbs.sh >/dev/null 2>&1; then
+              # If the exit code is 0 (success), the test passes
+              echo "✅ $test_name: PASSED" >> $REPORT_FILE
+            else
+              # If the exit code is not 0 (failure), the test fails
+              echo "❌ $test_name: FAILED" >> $REPORT_FILE
+            fi
+          }
+
+          # --- Test Execution ---
+          # We test most of the non-interactive options
+          
+          run_test "1" "Show Linux Version"
+          # Skipping 2 (nano) and 3 (gedit) -> They are interactive editors
+          run_test "4" "Install network tools (samba)"
+          # Skipping 5 (Install groups) -> Option is empty
+          run_test "6" "List files and directories"
+          run_test "7" "Assign permissions (user)" "README.md" "1"
+          run_test "8" "Show calendar"
+          run_test "9" "Show friendly cow" # Will install cowsay
+          # Skipping 10 (man) and 11 (less) -> They are interactive viewers
+          run_test "12" "Show specific file info (stat)" "README.md"
+          run_test "13" "Link files" "README.md" "test_link"
+          # Skipping 14 (Restart terminal) -> This would kill the CI runner and fail the job
+          run_test "15" "Create folders" "my_test_folder"
+          run_test "16" "Create files" "my_test_file.txt"
+          # Skipping 17, 18, 22 (User/Group creation) -> They prompt for interactive passwords
+          run_test "19" "Copy folders" "tests" "tests_copy" # Assumes you have a 'tests' folder
+          run_test "20" "Delete folder" "my_test_folder"
+          run_test "21" "Delete file" "my_test_file.txt"
+          run_test "23" "List users"
+          run_test "24" "List groups"
+          run_test "25" "Update the system"
+          # Skipping 26 (Firewall Rules) -> Your script has a nested 'if' syntax error
+          run_test "27" "Enable firewall"
+          run_test "28" "Disable firewall"
+          # Skipping 29 (SELF DESTRUCTION) -> It will shut down the PC and make the test end
+          
+          echo "" >> $REPORT_FILE
+          echo "--- Test Report Complete ---"
+          # Print the report to the GitHub Actions console for debugging
+          cat $REPORT_FILE
+
+      - name: 4. Upload Test Report Artifact
+        # 'if: always()' ensures the report is uploaded even if the previous step fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          # The name of the file you'll see on the GitHub Actions summary page
+          name: tests-options-report
+          # The file that will be uploaded
+          path: test-options.txt

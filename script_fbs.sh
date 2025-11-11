@@ -216,15 +216,19 @@ do
             instalar_si_no_existe "ufw"
             read -p "Ingrese el número de puerto: " numero_puerto
             read -p "1) permitir tráfico 2) bloquear tráfico" allow_deny_user
-            if [ "$allow_deny_user"="1" ]; then
-                sudo ufw allow "$numero_puerto"
-                echo "$numero_puerto abierto"
-            elif [ "$allow_deny_user"="2" ]; then
-                sudo ufw deny "$numero_puerto"
-                echo "$numero_puerto cerrado"
-            else
-                echo "$allow_deny_user no es una opción valida"
-            fi
+            case "$allow_deny_user" in
+                1)
+                    sudo ufw allow "$numero_puerto"
+                    echo "$numero_puerto abierto"
+                    ;;
+                2)
+                    sudo ufw deny "$numero_puerto"
+                    echo "$numero_puerto cerrado"
+                    ;;
+                *)
+                    echo "$allow_deny_user no es una opción valida"
+                    ;;
+            esac
         ;;
         "Activar firewall")
             instalar_si_no_existe "ufw"
