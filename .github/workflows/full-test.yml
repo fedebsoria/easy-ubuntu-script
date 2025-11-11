@@ -84,7 +84,8 @@ jobs:
           run_test "23" "List users"
           run_test "24" "List groups"
           run_test "25" "Update the system"
-          # Skipping 26 (Firewall Rules) -> Your script has a nested 'if' syntax error
+          run_test "26" "Create firewall rules (Allow)" "8080" "1"
+          run_test "26" "Create firewall rules (Deny)" "9090" "2"
           run_test "27" "Enable firewall"
           run_test "28" "Disable firewall"
           # Skipping 29 (SELF DESTRUCTION) -> It will shut down the PC and make the test end
