@@ -219,7 +219,7 @@ do
             if [ "$allow_deny_user"="1" ]; then
                 sudo ufw allow "$numero_puerto"
                 echo "$numero_puerto abierto"
-            else if [ "$allow_deny_user"="2" ]; then
+            elif [ "$allow_deny_user"="2" ]; then
                 sudo ufw deny "$numero_puerto"
                 echo "$numero_puerto cerrado"
             else
