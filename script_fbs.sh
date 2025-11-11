@@ -158,7 +158,7 @@ do
         "Vincular archivos")
             read -p "nombre del archivo a vincular: " nombre_archivo_vincular
             read -p "nombre del enlace: " nombre_enlace_vincular
-            ls -s "$nombre_archivo_vincular" "nombre_enlace_vincular"
+            ls -s "$nombre_archivo_vincular" "$nombre_enlace_vincular"
         ;;
         "Reiniciar terminal")
             echo "Reiniciando ($SHELL)..."
@@ -179,7 +179,7 @@ do
         ;;
         "Crear grupos")
             read -p "Escriba el nombre del grupo: " nombre_crear_grupo
-            sudo adduser "$nombre_crear_grupo"
+            sudo addgroup "$nombre_crear_grupo"
         ;;
         "Copiar carpetas")
             read -p "Escriba el nombre de la carpeta a copiar :" nombre_carpeta_copiar
