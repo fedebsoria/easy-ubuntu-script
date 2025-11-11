@@ -57,7 +57,7 @@ echo ""
 
 # Define the prompt that the user will see
 PS3="Por favor, introduce tu elección: "
-COLUMNS=1 # Force one option per line
+COLUMNS=3 # Force two option per line
 
 opciones=("Muestra la versión de Linux"
 "Crear archivos con nano"
@@ -94,36 +94,48 @@ opciones=("Muestra la versión de Linux"
 echo "---- Menu de admyn fácil ----"
 while true;do
 #Starts menu loop
-
+    echo "-----------------------------"
     select opt in "${opciones[@]}"
     do
         case $opt in
             "Muestra la versión de Linux")
                 echo "Mostrando la versión de Linux"
                 cat /etc/os-release
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
                 ;;
             "Crear archivos con nano")
                 read -p "Crear archivo con NANO. Ponga el nombre del archivo de texto: " nombre_archivo_nano
                 nano "$nombre_archivo_nano"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
                 ;;
             "Crear archivos con gedit")
                 read -p "Crear archivo con gedit. Ponga el nombre del archivo de texto: " nombre_archivo_gedit
                 instalar_si_no_existe "gedit"
                 gedit "$nombre_archivo_gedit"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Instalar herramientas de red (samba)")
                 echo "Instalando Samba"
                 sudo apt update && sudo apt install samba -y
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Instalar herramientas de grupos")
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Visualizar carpetas y archivos")
                 ls -l
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Asignar permisos")
@@ -140,64 +152,88 @@ while true;do
                 else
                     echo "opciones incorrectas"
                 fi
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Visualiza calendario")
                 instalar_si_no_existe ncal
                 echo "Mostrando calendario: "
                 ncal
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Visualizar vaquita simpática")
                 instalar_si_no_existe cowsay
                 cowsay "moore's law is dead"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Manual de un comando")
                 read -p "Nombre del comando del que quiere el manual :" nombre_comando_manual
                 man "$nombre_comando_manual"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Mostrar archivos sin posibilidad de editarlo")
                 read -p "Nombre del archivo a leer: " nombre_archivo_lectura
                 less "$nombre_archivo_lectura"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Información de un archivo especifico")
                 read -p "Nombre del archivo: " nombre_archivo_informacion
                 stat "$nombre_archivo_informacion"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Vincular archivos")
                 read -p "nombre del archivo a vincular: " nombre_archivo_vincular
                 read -p "nombre del enlace: " nombre_enlace_vincular
                 ls -s "$nombre_archivo_vincular" "$nombre_enlace_vincular"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Reiniciar terminal")
                 echo "Reiniciando ($SHELL)..."
                 sleep 2
                 exec "$SHELL"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Crear carpetas")
                 read -p "Escriba el nombre de la carpeta: (para más de una ponga los nombres separados con espacios)" nombre_crear_carpeta
                 mkdir "$nombre_crear_carpeta"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Crear archivos")
                 read -p "Escriba el nombre del archivo: (para más de uno ponga los nombres separados con espacios)" nombre_crear_archivo
                 touch "$nombre_crear_archivo"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Crear usuario")
                 read -p "Escriba el nombre del usuario: " nombre_crear_usuario
                 sudo adduser "$nombre_crear_usuario"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Crear grupos")
                 read -p "Escriba el nombre del grupo: " nombre_crear_grupo
                 sudo addgroup "$nombre_crear_grupo"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Copiar carpetas")
@@ -208,34 +244,48 @@ while true;do
                     ruta_destino_carpeta_copiar="."
                 fi
                 cp -av "$nombre_carpeta_copiar" "$ruta_destino_carpeta_copiar"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Eliminar carpeta")
                 read -p "Escriba el nombre o ruta de la carpeta a borrar: " nombre_carpeta_borrar
                 rm -r "$nombre_carpeta_borrar"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
                 ;;
             "Eliminar archivo")
                 read -p "Escriba el nombre o ruta del archivo a borrar: " nombre_archivo_borrar
                 rm "$nombre_archivo_borrar"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
                 ;;
             "Agregar un usuario a un grupo")
                 read -p "Escriba el nombre del usuario" nombre_usuario_grupo_asignar
                 read -p "Escriba el nombre del grupo al que quiere asignar: " nombre_grupo_a_asignar
                 sudo adduser "$nombre_usuario_grupo_asignar" "$nombre_grupo_a_asignar"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Listar usuarios")
                 awk -F: '$3 >= 1000 { print $1 }' /etc/passwd
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Listar grupos")
                 groups
+                read -p "Presione cualquier tecla para volver al menú"
+                echo "-----------------"
                 break
             ;;
             "Actualizar el sistema")
                 sudo apt update && sudo apt upgrade -y
+                read -p "Presione cualquier tecla para volver al menú"
+                echo "-----------------"
                 break
             ;;
             "Crear reglas para el firewall")
@@ -255,18 +305,24 @@ while true;do
                         echo "$allow_deny_user no es una opción valida"
                         ;;
                 esac
+                read -p "Presione cualquier tecla para volver al menú"
+                echo "-----------------"
                 break
             ;;
             "Activar firewall")
                 instalar_si_no_existe "ufw"
                 sudo ufw enable
                 echo "Firewall funcionando."
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Desactivar firewall")
                 instalar_si_no_existe "ufw"
                 sudo ufw disable
                 echo "Firewall desactivado.............cuidado"
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "AUTO DESTRUCCIÓN - SOLO EMERGENCIAS")
@@ -280,6 +336,8 @@ while true;do
                 else
                     echo "Operación cancelada."
                 fi
+                echo "-----------------"
+                read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
             "Salir")
@@ -288,6 +346,7 @@ while true;do
             ;;
             *)
                 echo "Opción invalida. Elige algo de la lista, que solo soy un script, no chatGPT ='( "
+                echo "-----------------"
                 break
             ;;
         esac
