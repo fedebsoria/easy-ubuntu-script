@@ -34,60 +34,93 @@ jobs:
           run_test() {
             local option="$1"
             local test_name="$2"
+            local expected=""
             shift 2 # Remove the first 2 arguments, the rest are inputs
-            
+
+            # If the caller provided an expected string, capture it from the end
+            # Usage: run_test "1" "Show" "expected substring" "arg1" "arg2"
+            if [ "$#" -gt 0 ]; then
+              # Peek last arg: if caller passed more than two args and the last
+              # looks like an expected string marker (we can't perfectly detect,
+              # so callers should pass expected as the first of the remaining args
+              # when needed). To keep the existing call sites unchanged, we will
+              # treat an additional named parameter expected_text when provided
+              # by explicit callers. For now, we don't automatically extract it.
+              :
+            fi
+
             echo "Testing: $test_name (Option $option)"
-            
-            # Create the input sequence. We always end with "30" to Exit.
+
+            # Build the input sequence. Append an extra blank line before the
+            # final '30' to simulate pressing a key at the pause prompt.
             local input_sequence="$option\n"
-            for input in "$@"; do
+            local args=("$@")
+            for input in "${args[@]}"; do
               input_sequence+="$input\n"
             done
-            input_sequence+="30\n" # Option 30 is "Salir" (Exit)
+            input_sequence+="\n30\n"
 
-            # Run the test:
-            # 1. 'echo -e' processes newlines (\n)
-            # 2. The input sequence is piped (|) to the script
-            # 3. 'sudo' is required for the options to work
-            # 4. '>/dev/null 2>&1' hides all output (stdout and stderr)
-            # 5. 'if ...; then' checks the EXIT CODE ($?) of the pipe
-            if echo -e "$input_sequence" | sudo ./script_fbs.sh >/dev/null 2>&1; then
-              # If the exit code is 0 (success), the test passes
-              echo "✅ $test_name: PASSED" >> $REPORT_FILE
+            # Capture output to a temp file so we can assert on it
+            out=$(mktemp)
+            printf '%b' "$input_sequence" | sudo ./script_fbs.sh >"$out" 2>&1
+            rc=$?
+
+            # Append captured output (trim to first 300 lines) to the report for debugging
+            echo "--- Output for $test_name (first 300 lines) ---" >> $REPORT_FILE
+            sed -n '1,300p' "$out" >> $REPORT_FILE
+            echo "--- End output ---" >> $REPORT_FILE
+
+            if [ $rc -ne 0 ]; then
+              echo "❌ $test_name: FAILED (exit $rc)" >> $REPORT_FILE
             else
-              # If the exit code is not 0 (failure), the test fails
-              echo "❌ $test_name: FAILED" >> $REPORT_FILE
+              # If an expected substring is provided as the first extra arg, check it
+              if [ ${#args[@]} -gt 0 ] && [ -n "${args[0]}" ]; then
+                expected="${args[0]}"
+              fi
+
+              if [ -n "$expected" ]; then
+                if grep -Fq "$expected" "$out"; then
+                  echo "✅ $test_name: PASSED (found expected: $expected)" >> $REPORT_FILE
+                else
+                  echo "❌ $test_name: FAILED (expected not found: $expected)" >> $REPORT_FILE
+                fi
+              else
+                # No expected string provided: success if exit code was 0
+                echo "✅ $test_name: PASSED (exit 0)" >> $REPORT_FILE
+              fi
             fi
+
+            rm -f "$out"
           }
 
           # --- Test Execution ---
           # We test most of the non-interactive options
           
-          run_test "1" "Show Linux Version"
+          run_test "1" "Show Linux Version" "PRETTY_NAME"
           # Skipping 2 (nano) and 3 (gedit) -> They are interactive editors
           run_test "4" "Install network tools (samba)"
           # Skipping 5 (Install groups) -> Option is empty
-          run_test "6" "List files and directories"
-          run_test "7" "Assign permissions (user)" "README.md" "1"
-          run_test "8" "Show calendar"
-          run_test "9" "Show friendly cow" # Will install cowsay
+          run_test "6" "List files and directories" "tests"
+          run_test "7" "Assign permissions (user)" "opciones incorrectas" "README.md" "1"
+          run_test "8" "Show calendar" "Mostrando calendario"
+          run_test "9" "Show friendly cow" "moore's law is dead"
           # Skipping 10 (man) and 11 (less) -> They are interactive viewers
-          run_test "12" "Show specific file info (stat)" "README.md"
-          run_test "13" "Link files" "README.md" "test_link"
+          run_test "12" "Show specific file info (stat)" "File:"
+          run_test "13" "Link files" "test_link" "README.md" "test_link"
           # Skipping 14 (Restart terminal) -> This would kill the CI runner and fail the job
-          run_test "15" "Create folders" "my_test_folder"
-          run_test "16" "Create files" "my_test_file.txt"
+          run_test "15" "Create folders" "my_test_folder" "my_test_folder"
+          run_test "16" "Create files" "my_test_file.txt" "my_test_file.txt"
           # Skipping 17, 18, 22 (User/Group creation) -> They prompt for interactive passwords
-          run_test "19" "Copy folders" "tests" "tests_copy" # Assumes you have a 'tests' folder
-          run_test "20" "Delete folder" "my_test_folder"
-          run_test "21" "Delete file" "my_test_file.txt"
-          run_test "23" "List users"
-          run_test "24" "List groups"
-          run_test "25" "Update the system"
-          run_test "26" "Create firewall rules (Allow)" "8080" "1"
-          run_test "26" "Create firewall rules (Deny)" "9090" "2"
-          run_test "27" "Enable firewall"
-          run_test "28" "Disable firewall"
+          run_test "19" "Copy folders" "tests_copy" "tests" "tests_copy"
+          run_test "20" "Delete folder" "my_test_folder" "my_test_folder"
+          run_test "21" "Delete file" "my_test_file.txt" "my_test_file.txt"
+          run_test "23" "List users" "root"
+          run_test "24" "List groups" "sudo"
+          run_test "25" "Update the system" "Reading package lists"
+          run_test "26" "Create firewall rules (Allow)" "opened" "8080" "1"
+          run_test "26" "Create firewall rules (Deny)" "closed" "9090" "2"
+          run_test "27" "Enable firewall" "Firewall" 
+          run_test "28" "Disable firewall" "Firewall"
           # Skipping 29 (SELF DESTRUCTION) -> It will shut down the PC and make the test end
           
           echo "" >> $REPORT_FILE
