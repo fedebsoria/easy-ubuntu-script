@@ -113,7 +113,7 @@ do
         ;;
         "Instalar herramientas de red (samba)")
             echo "Instalando Samba"
-            sudo apt update && sudo apt install smb -y
+            sudo apt update && sudo apt install samba -y
         ;;
         "Instalar herramientas de grupos")
         ;;
