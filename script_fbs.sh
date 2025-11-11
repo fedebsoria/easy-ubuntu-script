@@ -128,6 +128,7 @@ while true;do
                 break
             ;;
             "Instalar herramientas de grupos")
+                echo "En construcción"
                 echo "-----------------"
                 read -p "Presione cualquier tecla para volver al menú"
                 break
