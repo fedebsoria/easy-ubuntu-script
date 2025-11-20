@@ -128,8 +128,9 @@ while true;do
                 break
             ;;
             "Instalar herramientas de grupos")
-                echo "En construcción"
+                echo "Instalando libuser"
                 echo "-----------------------------"
+                instalar_si_no_existe "libuser"
                 read -p "Presione cualquier tecla para volver al menú"
                 break
             ;;
